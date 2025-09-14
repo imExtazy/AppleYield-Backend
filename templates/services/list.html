@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Услуги — AppleYield{% endblock %}
+
+{% block content %}
+  <section class="ay-hero">
+    <div class="ay-hero-head">
+      <div class="ay-hero-spacer"></div>
+      <h1 class="ay-hero-title">Услуги для расчета урожайности антоновки</h1>
+      <a class="ay-btn-app" href="/application/1/">
+        Заявка #1
+        <small>Позиций: {{ application_positions_count|default:0 }}</small>
+      </a>
+    </div>
+    <div class="ay-search-center">
+      <form method="get" action="/" class="ay-search-form">
+        <input class="ay-input-sm" type="text" name="q" placeholder="Поиск по наименованию" value="{{ q }}">
+        <button class="ay-btn ay-btn-sm" type="submit">Найти</button>
+      </form>
+    </div>
+  </section>
+
+  <div class="ay-grid-3">
+    {% for s in services %}
+      <div class="ay-card">
+        <div class="ay-card-inner">
+          <img src="{{ s.image_url }}" alt="{{ s.name }}">
+          <h3>{{ s.name }}</h3>
+          <div class="ay-main">{{ s.main_value }}</div>
+          <div>
+            <a href="/service/{{ s.id }}/" class="ay-btn-outline">Подробнее</a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="muted">Ничего не найдено.</p>
+    {% endfor %}
+  </div>
+{% endblock %}
+

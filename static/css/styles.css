@@ -1,0 +1,248 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #FFFFFF;
+  color: #111;
+  font-family: "Roboto", system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
+}
+
+.ay-header {
+  background: #199C68;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 24px;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding-left: 0;
+}
+
+.ay-home-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+.ay-home-link svg {
+  display: block;
+}
+
+.ay-home-link:link,
+.ay-home-link:visited { color: inherit; }
+
+/* Home button block in header */
+.ay-home {
+  width: 292px;
+  height: 100px;
+  padding: 0 20px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0;
+}
+
+.ay-home-logo {
+  width: 100px;
+  height: 100px;
+  max-width: 100px;
+  max-height: 100px;
+  object-fit: contain;
+  display: block;
+}
+
+.ay-home-title {
+  font-size: 32px !important;
+  font-weight: 400;
+  color: #000000 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 0;
+}
+
+.ay-application-link {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-decoration: none;
+  color: #fff;
+}
+
+.ay-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.ay-title { font-size: 28px; font-weight: 600; margin: 16px 0 12px; }
+
+/* Главный блок на главной странице */
+.ay-hero { margin-top: 1px; }
+.ay-hero-head { display: flex; align-items: center; justify-content: space-between; }
+.ay-hero-spacer { width: 100px; height: 1px; }
+.ay-hero-title { text-align: center; color: #199C68; font-size: 36px; font-weight: 600; margin: 0; }
+.ay-search-center { margin-top: 30px; display: flex; justify-content: center; }
+.ay-search-form { display: flex; align-items: center; gap: 10px; margin: 0; }
+.ay-input-sm {
+  width: 480px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid #000;
+  border-radius: 5px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+.ay-btn-sm { width: 100px; height: 30px; border-radius: 10px; }
+.ay-btn-app { width: 100px; height: 50px; border-radius: 10px; background: #199C68; color: #fff; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; flex-direction: column; font-size: 16px; font-weight: 500; }
+.ay-btn-app small { font-size: 16px; font-weight: 500; }
+
+.ay-search { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin: 12px 0 24px; }
+
+.ay-input { height: 44px; padding: 0 12px; border: 1px solid #D0D0D0; border-radius: 8px; font-size: 16px; }
+
+.ay-btn { height: 44px; padding: 0 16px; background: #199C68; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+.ay-btn.ay-btn-sm { height: 30px; width: 100px; }
+
+.ay-grid { display: grid; gap: 16px; }
+.ay-grid-3 { display: grid; grid-template-columns: repeat(3, 300px); gap: 24px; justify-content: center; margin-top: 50px; }
+
+.ay-card { background: #E9E9E9; border-radius: 20px; width: 300px; height: 400px; padding: 0; box-sizing: border-box; display: flex; }
+.ay-card-inner { width: 250px; height: 350px; margin: 25px auto 0; display: flex; flex-direction: column; align-items: center; gap: 35px; }
+
+.ay-card img { width: 250px; height: 150px; object-fit: cover; border-radius: 20px; background: #fff; }
+
+.ay-card h3 { margin: 0; font-size: 16px; text-align: center; }
+.ay-params { font-size: 14px; color: #333; white-space: pre-line; }
+.ay-main { font-weight: 500; font-size: 14px; text-align: center; white-space: pre-line; }
+.ay-btn-outline { width: 115.54px; height: 39.83px; border-radius: 10px; background: #fff; color: #000; border: 1px solid #000; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; font-weight: 500; }
+
+.ay-note { color: #444; font-size: 14px; }
+.ay-main { font-weight: 500; }
+
+.ay-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.ay-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.ay-item-left { flex: 1; }
+.ay-item-right { min-width: 260px; text-align: right; }
+
+.muted { color: #666; }
+
+
+/* Detail page */
+.ay-detail-card {
+  width: 763px;
+  height: 400px;
+  background: #E9E9E9;
+  border-radius: 20px;
+  display: flex;
+  overflow: hidden;
+  margin: 24px auto 0;
+}
+
+.ay-detail-image {
+  width: 300px;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+.ay-detail-info-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ay-detail-info {
+  width: 394px;
+  height: 230px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ay-detail-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.ay-detail-description {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #333;
+}
+
+.ay-detail-stats {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 14px;
+  color: #111;
+}
+
+/* Application page */
+.ay-app-head { margin-top: 25px; }
+.ay-app-title { margin: 0; font-size: 28px; font-weight: 600; }
+.ay-app-subtitle { margin-top: 10px; font-weight: 500; font-size: 16px; }
+.ay-app-meta { margin-top: 20px; font-weight: 500; font-size: 16px; color: #000000; }
+.ay-app-list { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+.ay-app-item {
+  width: 800px;
+  height: 100px;
+  background: #E9E9E9;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+}
+.ay-app-thumb {
+  width: 100px;
+  height: 80px;
+  border-radius: 5px;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+.ay-app-col { display: flex; flex-direction: column; gap: 2px; }
+.ay-app-name { font-weight: 600; gap: 16px}
+.ay-app-main { white-space: pre-line; color: #333; }
+.ay-app-precip, .ay-app-temp, .ay-app-comment { color: #111; font-size: 14px; }
+.ay-app-result { margin-top: 30px; font-weight: 600; font-size: 28px; color: #000000; }
+
+/* Row cells for application item */
+.ay-app-row { display: flex; align-items: center; gap: 10px; width: 100%; }
+.ay-app-cell-name { width: 90px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 20px; }
+.ay-app-cell-main {
+  width: 250px;
+  font-weight: 500;
+  max-height: 32px;
+  line-height: 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #000000;
+  font-size: 14px;
+}
+.ay-app-cell-precip { width: 80px; font-weight: 500; white-space: nowrap; font-size: 14px; }
+.ay-app-cell-temp { width: 70px; font-weight: 500; white-space: nowrap; font-size: 14px; }
+.ay-app-cell-comment { flex: 1; font-weight: 500; min-width: 0; white-space: normal; overflow-wrap: anywhere; line-height: 16px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; max-height: 48px; overflow: hidden; font-size: 14px; }

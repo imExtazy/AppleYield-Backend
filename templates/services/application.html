@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Заявка #{{ application.id }} — AppleYield{% endblock %}
+
+{% block content %}
+  <section class="ay-app-head">
+    <h1 class="ay-app-title">Заявка #{{ application.id }}</h1>
+    <div class="ay-app-subtitle">Позиций: {{ application_positions_count }}</div>
+    <div class="ay-app-meta">{{ application.location_person }}</div>
+  </section>
+
+  <div class="ay-app-list">
+    {% for p in positions %}
+      <div class="ay-app-item">
+        <img class="ay-app-thumb" src="{{ p.service.image_url }}" alt="{{ p.service.name }}">
+        <div class="ay-app-row">
+          <div class="ay-app-cell-name">{{ p.service.name }}</div>
+          <div class="ay-app-cell-main">{{ p.service.main_value|linebreaksbr }}</div>
+          <div class="ay-app-cell-precip">{{ p.sum_precipitation }}</div>
+          <div class="ay-app-cell-temp">{{ p.avg_temp }}</div>
+          <div class="ay-app-cell-comment">{{ p.comment }}</div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="muted">В заявке нет позиций.</p>
+    {% endfor %}
+  </div>
+
+  <div class="ay-app-result">Урожайность: {{ application.result }} ц/га</div>
+{% endblock %}
+

@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}AppleYield{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+  <header class="ay-header">
+    <a href="/" class="ay-home-link ay-home" aria-label="Домой">
+      <img class="ay-home-logo" src="{{ MINIO_STATIC_BASE }}/Logo_Apple.png" alt="AppleYield" width="100" height="100">
+      <span class="ay-home-title">AppleYield</span>
+    </a>
+  </header>
+
+  <main class="ay-container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
+
