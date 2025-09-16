@@ -8,17 +8,10 @@
     <div class="ay-hero-head">
       <div class="ay-hero-spacer"></div>
       <h1 class="ay-hero-title">Услуги для расчета урожайности антоновки</h1>
-      {% if current_calculation_id %}
-        <a class="ay-cart-link" href="/months_calculation/{{ current_calculation_id }}/" aria-label="Текущая заявка">
-          <img class="ay-cart-icon" src="{{ MINIO_STATIC_BASE }}/month_cart.svg" alt="Заявка">
-          <span class="ay-badge">{{ calculation_positions_count|default:0 }}</span>
-        </a>
-      {% else %}
-        <span class="ay-cart-link ay-cart-disabled" aria-label="Заявка отсутствует">
-          <img class="ay-cart-icon" src="{{ MINIO_STATIC_BASE }}/month_cart.svg" alt="Заявка">
-          <span class="ay-badge">0</span>
-        </span>
-      {% endif %}
+      <a class="ay-btn-app" href="/application/1/">
+        Заявка #1
+        <small>Позиций: {{ application_positions_count|default:0 }}</small>
+      </a>
     </div>
     <div class="ay-search-center">
       <form method="get" action="/" class="ay-search-form">
@@ -36,7 +29,7 @@
           <h3>{{ s.name }}</h3>
           <div class="ay-main">{{ s.main_value }}</div>
           <div>
-            <a href="/month/{{ s.id }}/" class="ay-btn-outline">Подробнее</a>
+            <a href="/service/{{ s.id }}/" class="ay-btn-outline">Подробнее</a>
           </div>
         </div>
       </div>
