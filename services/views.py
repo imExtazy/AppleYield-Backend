@@ -20,7 +20,6 @@ def list_view(request):
             return (s.get("name", "").lower()).startswith(q)
         services = [s for s in SERVICES if matches(s)]
 
-    # Соберём публичный URL для образов из MinIO
     bucket = getattr(settings, "AWS_STORAGE_BUCKET_NAME", "media")
     base = getattr(settings, "AWS_S3_ENDPOINT_URL", "http://localhost:9000").rstrip("/")
     def with_image_url(s):
@@ -62,9 +61,7 @@ def application_view(request, id: int):
     for item in application.get("items", []):
         service = next((s for s in SERVICES if s["id"] == item["service_id"]), None)
         if not service:
-            # Если сервис не найден, пропускаем позицию
             continue
-        # Добавляем image_url из MinIO для позиции
         bucket = getattr(settings, "AWS_STORAGE_BUCKET_NAME", "apple-media")
         base = getattr(settings, "AWS_S3_ENDPOINT_URL", "http://localhost:9000").rstrip("/")
         image_key = (service.get("image_key") or "placeholder.png")
@@ -73,11 +70,7 @@ def application_view(request, id: int):
 
         positions.append({
             "service": service_with_image,
-            "quantity": item.get("quantity"),
-            "order": item.get("order"),
-            "primary": item.get("primary"),
             "comment": item.get("comment"),
-            "other": item.get("other"),
             "sum_precipitation": item.get("sum_precipitation", ""),
             "avg_temp": item.get("avg_temp", ""),
         })

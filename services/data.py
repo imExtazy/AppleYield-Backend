@@ -17,8 +17,8 @@ SERVICES = [
         "image_key": "Jule_Apple.jpeg",
         "description": "Самый тёплый период сезона. Требуется контроль за поливом и состоянием почвы.",
         "stats": {
-            "temperature": "+5...+7°C (днём), 0...+3°C (ночью)",
-            "precipitation": "50-60 мм",
+            "temperature": "+18...+22°C (днём), +12...+15°C (ночью)",
+            "precipitation": "70-90 мм",
         },
     },
     {
@@ -28,8 +28,8 @@ SERVICES = [
         "image_key": "August_Apple.jpeg",
         "description": "Период созревания. Важно отслеживать погодные риски и поддерживать агротехнику.",
         "stats": {
-            "temperature": "+5...+7°C (днём), 0...+3°C (ночью)",
-            "precipitation": "50-60 мм",
+            "temperature": "+16...+20°C (днём), +10...+13°C (ночью)", 
+            "precipitation": "80-100 мм",
         },
     },
     {
@@ -39,8 +39,8 @@ SERVICES = [
         "image_key": "September_Apple.jpeg",
         "description": "Начало сбора урожая. Температуры ниже, осадки участятся.",
         "stats": {
-            "temperature": "+5...+7°C (днём), 0...+3°C (ночью)",
-            "precipitation": "50-60 мм",
+            "temperature": "+12...+15°C (днём), +6...+9°C (ночью)",
+            "precipitation": "60-80 мм",
         },
     },
     {
@@ -50,8 +50,8 @@ SERVICES = [
         "image_key": "October_Apple.jpeg",
         "description": "Похолодание и снижение солнечной активности. Подготовка садов к зиме.",
         "stats": {
-            "temperature": "+5...+7°C (днём), 0...+3°C (ночью)",
-            "precipitation": "50-60 мм",
+            "temperature": "+6...+9°C (днём), +2...+4°C (ночью)",
+            "precipitation": "50-70 мм",
         },
     },
     {
@@ -61,8 +61,8 @@ SERVICES = [
         "image_key": "November_Apple.jpeg",
         "description": "Поздняя осень. Низкие температуры, короткий световой день.",
         "stats": {
-            "temperature": "+5...+7°C (днём), 0...+3°C (ночью)",
-            "precipitation": "50-60 мм",
+            "temperature": "+1...+3°C (днём), -2...-4°C (ночью)",
+            "precipitation": "40-60 мм",
         },
     },
 ]
@@ -70,26 +70,18 @@ SERVICES = [
 APPLICATIONS = {
     1: {
         "id": 1,
-        "result": "42.0",
+        "result": "45",
         "location_person": "Московская обл., Петров В. П.",
         "items": [
             {
                 "service_id": 2,
-                "quantity": 1,
-                "order": 1,
-                "primary": True,
                 "comment": "Погибло несколько деревьев",
-                "other": "—",
                 "sum_precipitation": "100 мм",
                 "avg_temp": "18°C",
             },
             {
                 "service_id": 5,
-                "quantity": 3,
-                "order": 2,
-                "primary": False,
                 "comment": "Урожая меньше нормы",
-                "other": "калибровка требуется",
                 "sum_precipitation": "40 мм",
                 "avg_temp": "24°C",
             },
