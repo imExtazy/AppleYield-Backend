@@ -15,6 +15,11 @@
           <div>Температура: {{ service.stats.temperature }}</div>
           <div>Осадки: {{ service.stats.precipitation }}</div>
         </div>
+        <form method="post" action="/service/{{ service.id }}/add/" style="margin-top:16px; display:flex; gap:8px; align-items:center;">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="/">
+          <button class="ay-btn ay-btn-sm" type="submit">Добавить в заявку</button>
+        </form>
       </div>
     </div>
   </div>

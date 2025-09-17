@@ -8,10 +8,17 @@
     <div class="ay-hero-head">
       <div class="ay-hero-spacer"></div>
       <h1 class="ay-hero-title">Услуги для расчета урожайности антоновки</h1>
-      <a class="ay-btn-app" href="/application/1/">
-        Заявка #1
-        <small>Позиций: {{ application_positions_count|default:0 }}</small>
-      </a>
+      {% if current_application_id %}
+        <a class="ay-btn-app" href="/application/{{ current_application_id }}/">
+          Заявка #{{ current_application_id }}
+          <small>Позиций: {{ application_positions_count|default:0 }}</small>
+        </a>
+      {% else %}
+        <span class="ay-btn-app" style="opacity:0.6; cursor: default; pointer-events: none;">
+          Заявка
+          <small>Позиций: 0</small>
+        </span>
+      {% endif %}
     </div>
     <div class="ay-search-center">
       <form method="get" action="/" class="ay-search-form">

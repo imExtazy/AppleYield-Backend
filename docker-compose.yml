@@ -1,6 +1,18 @@
 version: '3.7'
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: appleyield-postgres
+    environment:
+      POSTGRES_DB: appleyield
+      POSTGRES_USER: appleyield
+      POSTGRES_PASSWORD: appleyield
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
   minio1:
     image: quay.io/minio/minio:RELEASE.2022-10-15T19-57-03Z
     command: server --console-address ":9001" http://minio{1...4}/data{1...2}
@@ -66,12 +78,14 @@ services:
       - "9000:9000"
       - "9001:9001"
     depends_on:
+      - postgres
       - minio1
       - minio2
       - minio3
       - minio4
 
 volumes:
+  pgdata:
   data1-1:
   data1-2:
   data2-1:

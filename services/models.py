@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Service(models.Model):
     STATUSES = [
@@ -6,17 +7,18 @@ class Service(models.Model):
         ("deleted", "Удалена"),
     ]
 
-    name = models.CharField(max_length=200)  
-    description = models.TextField()  
-    main_value = models.TextField() 
-    image_key = models.CharField(max_length=255, null=True, blank=True)  
-    temperature = models.CharField(max_length=100, null=True, blank=True)  
-    precipitation = models.CharField(max_length=100, null=True, blank=True)  
-    status = models.CharField(
-        max_length=20,
-        choices=STATUSES,
-        default="active",
-    )
+    name = models.CharField(max_length=200)
+    description = models.TextField()
+    main_value = models.TextField()
+    image_key = models.CharField(max_length=255, null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUSES, default="active")
+
+    # Параметры расчёта и фактические показатели месяца
+    base_yield = models.DecimalField(max_digits=10, decimal_places=2)
+    ideal_temp = models.DecimalField(max_digits=5, decimal_places=2)
+    ideal_precip = models.IntegerField()
+    temperature = models.DecimalField(max_digits=5, decimal_places=2)
+    precipitation = models.IntegerField()
 
     def __str__(self):
         return self.name
@@ -48,25 +50,27 @@ class Order(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
     submitted_at = models.DateTimeField(null=True, blank=True)
     finished_at = models.DateTimeField(null=True, blank=True)
-    moderator = models.ForeignKey(
-        User, related_name="moderated_orders",
-        on_delete=models.PROTECT, null=True, blank=True
-    )
+    moderator = models.ForeignKey(User, related_name="moderated_orders", on_delete=models.PROTECT, null=True, blank=True)
 
-    location = models.CharField(max_length=50, choices=LOCATIONS)
-    person = models.CharField(max_length=50, choices=PERSONS)
+    # Предметные поля заявки
+    location = models.CharField(max_length=50, choices=LOCATIONS, default="moscow")
+    person = models.CharField(max_length=50, choices=PERSONS, default="ivanov")
 
     def __str__(self):
         return f"Order {self.id} ({self.status})"
 
 
-    class Meta:
-        unique_together = ("order", "service")
-
 class OrderService(models.Model):
     order = models.ForeignKey(Order, on_delete=models.PROTECT)
     service = models.ForeignKey(Service, on_delete=models.PROTECT)
-    sum_precipitation = models.FloatField()
-    avg_temp = models.FloatField()
-    comment = models.TextField(null=True, blank=True)        
+    sum_precipitation = models.DecimalField(max_digits=10, decimal_places=2)
+    avg_temp = models.DecimalField(max_digits=5, decimal_places=2)
+    comment = models.TextField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ("order", "service")
+
+    def __str__(self):
+        return f"OrderService(order={self.order_id}, service={self.service_id})"
+
 # Create your models here.

@@ -112,6 +112,11 @@ html, body {
 .ay-grid { display: grid; gap: 16px; }
 .ay-grid-3 { display: grid; grid-template-columns: repeat(3, 300px); gap: 24px; justify-content: center; margin-top: 50px; }
 
+/* Larger inputs and controls for application editing */
+.ay-input-lg { height: 30px; padding: 0 10px; border: 1px solid #000; border-radius: 5px; font-size: 14px; width: 200px; box-sizing: border-box; }
+.ay-textarea { width: 100%; min-height: 64px; border: 1px solid #000; border-radius: 5px; font-size: 14px; padding: 6px 8px; box-sizing: border-box; resize: vertical; }
+.ay-hidden-submit { display: none; }
+
 .ay-card { background: #E9E9E9; border-radius: 20px; width: 300px; height: 400px; padding: 0; box-sizing: border-box; display: flex; }
 .ay-card-inner { width: 250px; height: 350px; margin: 25px auto 0; display: flex; flex-direction: column; align-items: center; gap: 35px; }
 
@@ -246,3 +251,4 @@ html, body {
 .ay-app-cell-precip { width: 80px; font-weight: 500; white-space: nowrap; font-size: 14px; }
 .ay-app-cell-temp { width: 70px; font-weight: 500; white-space: nowrap; font-size: 14px; }
 .ay-app-cell-comment { flex: 1; font-weight: 500; min-width: 0; white-space: normal; overflow-wrap: anywhere; line-height: 16px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; max-height: 48px; overflow: hidden; font-size: 14px; }
+.ay-app-actions { margin-top: 8px; display: flex; justify-content: flex-end; }
