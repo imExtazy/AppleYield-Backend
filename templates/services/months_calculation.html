@@ -7,6 +7,28 @@
   <section class="ay-app-head">
     <h1 class="ay-app-title">Заявка #{{ calculation.id }}</h1>
     <div class="ay-app-subtitle">Позиций: {{ calculation_positions_count }}</div>
+    <form method="post" action="{% url 'months_calculation_delete' calculation.id %}" style="margin-top:12px;">
+      {% csrf_token %}
+      <button class="ay-btn ay-btn-sm" type="submit">Удалить заявку</button>
+    </form>
+    {% if positions %}
+    <div style="margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <label>Локация
+        <select name="location" class="ay-input-lg">
+          {% for val,label in locations %}
+            <option value="{{ val }}" {% if application.location == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Ответственный
+        <select name="person" class="ay-input-lg">
+          {% for val,label in persons %}
+            <option value="{{ val }}" {% if application.person == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+    {% endif %}
   </section>
 
   <div class="ay-app-list">
@@ -16,9 +38,15 @@
         <div class="ay-app-row">
           <div class="ay-app-cell-name">{{ p.service.name }}</div>
           <div class="ay-app-cell-main">{{ p.service.main_value|linebreaksbr }}</div>
-          <div class="ay-app-cell-precip">{{ p.sum_precipitation }}</div>
-          <div class="ay-app-cell-temp">{{ p.avg_temp }}</div>
-          <div class="ay-app-cell-comment">{{ p.comment }}</div>
+          <div class="ay-app-cell-precip">
+            <input class="ay-input-lg ay-app-input" type="number" step="0.01" name="sum_precipitation_{{ p.service.id }}" value="{{ p.sum_precipitation }}">
+          </div>
+          <div class="ay-app-cell-temp">
+            <input class="ay-input-lg ay-app-input" type="number" step="0.01" name="avg_temp_{{ p.service.id }}" value="{{ p.avg_temp }}">
+          </div>
+          <div class="ay-app-cell-comment">
+            <textarea class="ay-textarea" name="comment_{{ p.service.id }}">{{ p.comment }}</textarea>
+          </div>
         </div>
       </div>
     {% empty %}

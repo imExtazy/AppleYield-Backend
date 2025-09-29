@@ -16,7 +16,12 @@ def _get_current_draft_order_for_demo():
     return Order.objects.filter(created_by=demo, status="draft").first()
 
 
-def list_view(request):
+def _get_current_draft_order_for_request(request):
+    user = request.user if getattr(request, "user", None) and request.user.is_authenticated else _get_or_create_demo_user()
+    return Order.objects.filter(created_by=user, status="draft").first()
+
+
+def months_list_view(request):
     q = (request.GET.get("q") or "").strip()
     qs = Service.objects.filter(status="active")
     if q:
@@ -34,19 +39,19 @@ def list_view(request):
             "image_url": f"{base}/{bucket}/{image_key}",
         })
 
-    draft = _get_current_draft_order_for_demo()
+    draft = _get_current_draft_order_for_request(request)
     positions_count = OrderService.objects.filter(order=draft).count() if draft else 0
 
     context = {
         "services": services,
         "q": request.GET.get("q", ""),
-        "application_positions_count": positions_count,
-        "current_application_id": draft.id if draft else None,
+        "calculation_positions_count": positions_count,
+        "current_calculation_id": draft.id if draft else None,
     }
-    return render(request, "services/list.html", context)
+    return render(request, "services/months_list.html", context)
 
 
-def detail_view(request, id: int):
+def month_detail_view(request, id: int):
     s = get_object_or_404(Service, pk=id, status="active")
     bucket = getattr(settings, "AWS_STORAGE_BUCKET_NAME", "apple-media")
     base = getattr(settings, "AWS_S3_ENDPOINT_URL", "http://localhost:9000").rstrip("/")
@@ -62,17 +67,13 @@ def detail_view(request, id: int):
         },
         "image_url": f"{base}/{bucket}/{image_key}",
     }
-    draft = _get_current_draft_order_for_demo()
-    positions_count = OrderService.objects.filter(order=draft).count() if draft else 0
     context = {
         "service": service,
-        "application_positions_count": positions_count,
-        "current_application_id": draft.id if draft else None,
     }
-    return render(request, "services/detail.html", context)
+    return render(request, "services/month_detail.html", context)
 
 
-def application_view(request, id: int):
+def months_calculation_view(request, id: int):
     order = get_object_or_404(Order, pk=id)
     if order.status == "deleted":
         raise Http404("Application not found")
@@ -96,22 +97,22 @@ def application_view(request, id: int):
         })
 
     context = {
-        "application": {
+        "calculation": {
             "id": order.id,
-            "result": "",  # вычисление не требуется по ТЗ показа
+            "result": "",
             "location_person": (order.location or "") + (", " + order.person if order.person else ""),
             "location": order.location,
             "person": order.person,
         },
         "positions": positions,
-        "application_positions_count": len(positions),
+        "calculation_positions_count": len(positions),
         "locations": getattr(Order, "LOCATIONS", []),
         "persons": getattr(Order, "PERSONS", []),
     }
-    return render(request, "services/application.html", context)
+    return render(request, "services/months_calculation.html", context)
 
 
-def add_to_application_view(request, id: int):
+def add_to_calculation_view(request, id: int):
     if request.method != "POST":
         return HttpResponseNotAllowed(["POST"])
 
@@ -120,72 +121,20 @@ def add_to_application_view(request, id: int):
     if not order:
         order = Order.objects.create(created_by=demo, status="draft")
 
-    # Возможное обновление полей заявки (селекты)
-    location = request.POST.get("location")
-    person = request.POST.get("person")
-    updated_order = False
-    if location:
-        order.location = location
-        updated_order = True
-    if person:
-        order.person = person
-        updated_order = True
-    if updated_order:
-        order.save()
-
-    # Detect batch fields like sum_precipitation_<service_id>, avg_temp_<service_id>, comment_<service_id>
-    batch_ids = set()
-    for key in request.POST.keys():
-        if key.startswith("sum_precipitation_") or key.startswith("avg_temp_") or key.startswith("comment_"):
-            try:
-                sid = int(key.split("_", 1)[1])
-                batch_ids.add(sid)
-            except Exception:
-                pass
-
-    if batch_ids:
-        for sid in batch_ids:
-            service = get_object_or_404(Service, pk=sid, status="active")
-            avg_temp = request.POST.get(f"avg_temp_{sid}")
-            sum_precipitation = request.POST.get(f"sum_precipitation_{sid}")
-            comment = request.POST.get(f"comment_{sid}")
-            obj, created = OrderService.objects.get_or_create(order=order, service=service, defaults={
-                "avg_temp": avg_temp or 0,
-                "sum_precipitation": sum_precipitation or 0,
-                "comment": comment or "",
-            })
-            if not created:
-                if avg_temp is not None and avg_temp != "":
-                    obj.avg_temp = avg_temp
-                if sum_precipitation is not None and sum_precipitation != "":
-                    obj.sum_precipitation = sum_precipitation
-                if comment is not None:
-                    obj.comment = comment
-                obj.save()
-    else:
-        # Single-item mode (detail page button)
-        service = get_object_or_404(Service, pk=id, status="active")
-        avg_temp = request.POST.get("avg_temp")
-        sum_precipitation = request.POST.get("sum_precipitation")
-        comment = request.POST.get("comment")
-        obj, created = OrderService.objects.get_or_create(order=order, service=service, defaults={
-            "avg_temp": avg_temp or 0,
-            "sum_precipitation": sum_precipitation or 0,
-            "comment": comment or "",
-        })
-        if not created:
-            obj.avg_temp = avg_temp or obj.avg_temp
-            obj.sum_precipitation = sum_precipitation or obj.sum_precipitation
-            obj.comment = comment or obj.comment
-            obj.save()
-
-    next_url = request.POST.get("next")
-    if next_url:
-        return redirect(next_url)
-    return redirect("services_list")
+    service = get_object_or_404(Service, pk=id, status="active")
+    OrderService.objects.get_or_create(
+        order=order,
+        service=service,
+        defaults={
+            "avg_temp": 0,
+            "sum_precipitation": 0,
+            "comment": "",
+        },
+    )
+    return redirect("months_list")
 
 
-def delete_application_view(request, id: int):
+def delete_calculation_view(request, id: int):
     if request.method != "POST":
         return HttpResponseNotAllowed(["POST"])
     with connection.cursor() as cursor:
@@ -193,6 +142,6 @@ def delete_application_view(request, id: int):
             "UPDATE services_order SET status=%s WHERE id=%s AND status <> %s",
             ["deleted", id, "deleted"],
         )
-    return redirect("services_list")
+    return redirect("months_list")
 
 # Create your views here.

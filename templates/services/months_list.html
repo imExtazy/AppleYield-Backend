@@ -35,8 +35,12 @@
           <img src="{{ s.image_url }}" alt="{{ s.name }}">
           <h3>{{ s.name }}</h3>
           <div class="ay-main">{{ s.main_value }}</div>
-          <div>
+          <div style="display:flex; gap:10px; align-items:center; justify-content:center;">
             <a href="/month/{{ s.id }}/" class="ay-btn-outline">Подробнее</a>
+            <form method="post" action="{% url 'month_add' s.id %}">
+              {% csrf_token %}
+              <button class="ay-btn-add" type="submit">В расчет</button>
+            </form>
           </div>
         </div>
       </div>

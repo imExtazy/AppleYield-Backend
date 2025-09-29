@@ -1,12 +1,18 @@
 from django.urls import path
-from .views import list_view, detail_view, application_view, add_to_application_view, delete_application_view
+from .views import (
+    months_list_view,
+    month_detail_view,
+    months_calculation_view,
+    add_to_calculation_view,
+    delete_calculation_view,
+)
 
 urlpatterns = [
-    path('', list_view, name='services_list'),
-    path('service/<int:id>/', detail_view, name='service_detail'),
-    path('application/<int:id>/', application_view, name='application_detail'),
-    path('service/<int:id>/add/', add_to_application_view, name='service_add'),
-    path('application/<int:id>/delete/', delete_application_view, name='application_delete'),
+    path('', months_list_view, name='months_list'),
+    path('month/<int:id>/', month_detail_view, name='month_detail'),
+    path('months_calculation/<int:id>/', months_calculation_view, name='months_calculation'),
+    path('month/<int:id>/add/', add_to_calculation_view, name='month_add'),
+    path('months_calculation/<int:id>/delete/', delete_calculation_view, name='months_calculation_delete'),
 ]
 
 
