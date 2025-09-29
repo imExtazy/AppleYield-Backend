@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ service.name }} — AppleYield{% endblock %}
+
+{% block content %}
+  <div class="ay-detail-card">
+    <img class="ay-detail-image" src="{{ service.image_url }}" alt="{{ service.name }}">
+    <div class="ay-detail-info-wrapper">
+      <div class="ay-detail-info">
+        <h1 class="ay-detail-title">{{ service.name }}</h1>
+        <div class="ay-detail-description">{{ service.description }}</div>
+        <div class="ay-detail-stats">
+          <div><strong>Средние показатели:</strong></div>
+          <div>Температура: {{ service.stats.temperature }}</div>
+          <div>Осадки: {{ service.stats.precipitation }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

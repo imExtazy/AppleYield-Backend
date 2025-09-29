@@ -1,4 +1,4 @@
-SERVICES = [
+MONTHS = [
     {
         "id": 1,
         "name": "Июнь",
@@ -67,7 +67,7 @@ SERVICES = [
     },
 ]
 
-APPLICATIONS = {
+MONTHS_CALCULATIONS = {
     1: {
         "id": 1,
         "result": "45",
