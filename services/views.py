@@ -3,7 +3,7 @@ from django.conf import settings
 from django.http import Http404, HttpResponseNotAllowed
 from django.db import connection
 from django.contrib.auth.models import User
-from .models import Service, Order, OrderService
+from .models import Months, Months_calculation, Month_indicators
 
 
 def _get_or_create_demo_user() -> User:
@@ -13,34 +13,35 @@ def _get_or_create_demo_user() -> User:
 
 def _get_current_draft_order_for_demo():
     demo = _get_or_create_demo_user()
-    return Order.objects.filter(created_by=demo, status="draft").first()
+    return Months_calculation.objects.filter(created_by=demo, status="draft").first()
 
 
 def _get_current_draft_order_for_request(request):
     user = request.user if getattr(request, "user", None) and request.user.is_authenticated else _get_or_create_demo_user()
-    return Order.objects.filter(created_by=user, status="draft").first()
+    return Months_calculation.objects.filter(created_by=user, status="draft").first()
 
 
 def months_list_view(request):
     q = (request.GET.get("q") or "").strip()
-    qs = Service.objects.filter(status="active")
+    qs = Months.objects.filter(status="active")
     if q:
-        qs = qs.filter(name__istartswith=q)
+        qs = qs.filter(month_name__istartswith=q)
 
     bucket = getattr(settings, "AWS_STORAGE_BUCKET_NAME", "apple-media")
     base = getattr(settings, "AWS_S3_ENDPOINT_URL", "http://localhost:9000").rstrip("/")
     services = []
     for s in qs:
-        image_key = s.image_key or "placeholder.png"
+        image_key = s.month_image or "placeholder.png"
         services.append({
-            "id": s.id,
-            "name": s.name,
+            "id": s.pk,
+            "name": s.month_name,
             "main_value": s.main_value,
             "image_url": f"{base}/{bucket}/{image_key}",
         })
 
-    draft = _get_current_draft_order_for_request(request)
-    positions_count = OrderService.objects.filter(order=draft).count() if draft else 0
+    # Корзина привязана к демо-пользователю (добавление идёт от demo)
+    draft = _get_current_draft_order_for_demo()
+    positions_count = Month_indicators.objects.filter(order=draft).count() if draft else 0
 
     context = {
         "services": services,
@@ -52,13 +53,13 @@ def months_list_view(request):
 
 
 def month_detail_view(request, id: int):
-    s = get_object_or_404(Service, pk=id, status="active")
+    s = get_object_or_404(Months, pk=id, status="active")
     bucket = getattr(settings, "AWS_STORAGE_BUCKET_NAME", "apple-media")
     base = getattr(settings, "AWS_S3_ENDPOINT_URL", "http://localhost:9000").rstrip("/")
-    image_key = s.image_key or "placeholder.png"
+    image_key = s.month_image or "placeholder.png"
     service = {
-        "id": s.id,
-        "name": s.name,
+        "id": s.pk,
+        "name": s.month_name,
         "description": s.description,
         "main_value": s.main_value,
         "stats": {
@@ -74,20 +75,20 @@ def month_detail_view(request, id: int):
 
 
 def months_calculation_view(request, id: int):
-    order = get_object_or_404(Order, pk=id)
+    order = get_object_or_404(Months_calculation, pk=id)
     if order.status == "deleted":
         raise Http404("Application not found")
 
     bucket = getattr(settings, "AWS_STORAGE_BUCKET_NAME", "apple-media")
     base = getattr(settings, "AWS_S3_ENDPOINT_URL", "http://localhost:9000").rstrip("/")
     positions = []
-    for pos in OrderService.objects.select_related("service").filter(order=order):
+    for pos in Month_indicators.objects.select_related("service").filter(order=order):
         s = pos.service
-        image_key = s.image_key or "placeholder.png"
+        image_key = s.month_image or "placeholder.png"
         positions.append({
             "service": {
-                "id": s.id,
-                "name": s.name,
+                "id": s.pk,
+                "name": s.month_name,
                 "main_value": s.main_value,
                 "image_url": f"{base}/{bucket}/{image_key}",
             },
@@ -106,8 +107,8 @@ def months_calculation_view(request, id: int):
         },
         "positions": positions,
         "calculation_positions_count": len(positions),
-        "locations": getattr(Order, "LOCATIONS", []),
-        "persons": getattr(Order, "PERSONS", []),
+        "locations": getattr(Months_calculation, "LOCATIONS", []),
+        "persons": getattr(Months_calculation, "PERSONS", []),
     }
     return render(request, "services/months_calculation.html", context)
 
@@ -117,12 +118,12 @@ def add_to_calculation_view(request, id: int):
         return HttpResponseNotAllowed(["POST"])
 
     demo = _get_or_create_demo_user()
-    order = Order.objects.filter(created_by=demo, status="draft").first()
+    order = Months_calculation.objects.filter(created_by=demo, status="draft").first()
     if not order:
-        order = Order.objects.create(created_by=demo, status="draft")
+        order = Months_calculation.objects.create(created_by=demo, status="draft")
 
-    service = get_object_or_404(Service, pk=id, status="active")
-    OrderService.objects.get_or_create(
+    service = get_object_or_404(Months, pk=id, status="active")
+    Month_indicators.objects.get_or_create(
         order=order,
         service=service,
         defaults={
