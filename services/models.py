@@ -2,17 +2,12 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Months(models.Model):
-    month_id = models.AutoField(primary_key=True, db_column="id")
-    month_name = models.CharField(max_length=200, db_column="name")
+    month_id = models.AutoField(primary_key=True)
+    month_name = models.CharField(max_length=200)
     description = models.TextField()
     main_value = models.TextField()
-    month_image = models.CharField(max_length=255, null=True, blank=True, db_column="image_key")
-    status = models.CharField(
-        max_length=20,
-        choices=[("active", "Активна"), ("deleted", "Удалена")],
-        default="active",
-        db_column="status",
-    )
+    month_image = models.CharField(max_length=255, null=True, blank=True)
+    status = models.BooleanField(default=True)
 
     # Параметры расчёта и фактические показатели месяца
     base_yield = models.DecimalField(max_digits=10, decimal_places=2)
@@ -22,7 +17,7 @@ class Months(models.Model):
     precipitation = models.IntegerField()
 
     class Meta:
-        db_table = "services_service"
+        db_table = "services_months"
 
     def __str__(self):
         return self.month_name
@@ -61,7 +56,7 @@ class Months_calculation(models.Model):
     person = models.CharField(max_length=50, choices=PERSONS, default="ivanov")
 
     class Meta:
-        db_table = "services_order"
+        db_table = "services_months_calculation"
 
     def __str__(self):
         return f"Order {self.id} ({self.status})"
@@ -75,7 +70,7 @@ class Month_indicators(models.Model):
     comment = models.TextField(null=True, blank=True)
 
     class Meta:
-        db_table = "services_orderservice"
+        db_table = "services_month_indicators"
         unique_together = ("order", "service")
 
     def __str__(self):

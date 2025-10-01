@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
-from django.http import Http404, HttpResponseNotAllowed
+from django.http import Http404, HttpResponseNotAllowed, HttpResponse
 from django.db import connection
 from django.contrib.auth.models import User
 from .models import Months, Months_calculation, Month_indicators
@@ -24,7 +24,7 @@ def _get_current_draft_order_for_request(request):
 
 def calculate_application_yield_demo(order_id: int) -> Decimal:
     """
-    Демонстрационный расчёт итоговой урожайности по заявке без интеграции в прод.
+    Демонстрационный расчёт итоговой урожайности по заявке без интеграции.
 
     Алгоритм:
     - Для каждой позиции заявки берём базовую урожайность месяца (base_yield)
@@ -51,18 +51,28 @@ def calculate_application_yield_demo(order_id: int) -> Decimal:
         actual_temp = pos.avg_temp if pos.avg_temp is not None else ideal_temp
         actual_precip = pos.sum_precipitation if pos.sum_precipitation is not None else ideal_precip
 
-        # Защита от случая 0 в идеальном значении
         if ideal_temp == 0:
-            temp_coef = Decimal("1")
+            if actual_temp == 0:
+                temp_coef = Decimal("1")
+            else:
+                temp_coef = Decimal("1") / (Decimal(actual_temp) + 1)
         else:
-            temp_coef = Decimal(actual_temp) / Decimal(ideal_temp)
+            temp_coef = max(
+                Decimal("0"), 
+                Decimal("1") - abs(Decimal(actual_temp) - Decimal(ideal_temp)) / Decimal(ideal_temp))
             if temp_coef > 1:
                 temp_coef = Decimal("1")
 
         if ideal_precip == 0:
-            precip_coef = Decimal("1")
+            if actual_precip == 0:
+                precip_coef = Decimal("1")
+            else:
+                precip_coef = Decimal("1") / (Decimal(actual_precip) + 1)
         else:
-            precip_coef = Decimal(actual_precip) / Decimal(ideal_precip)
+            precip_coef = max(
+                Decimal("0"),
+                Decimal("1") - abs(Decimal(actual_precip) - Decimal(ideal_precip)) / Decimal(ideal_precip)
+            )
             if precip_coef > 1:
                 precip_coef = Decimal("1")
 
@@ -77,7 +87,7 @@ def calculate_application_yield_demo(order_id: int) -> Decimal:
 
 def months_list_view(request):
     q = (request.GET.get("q") or "").strip()
-    qs = Months.objects.filter(status="active")
+    qs = Months.objects.filter(status=True)
     if q:
         qs = qs.filter(month_name__istartswith=q)
 
@@ -107,7 +117,7 @@ def months_list_view(request):
 
 
 def month_detail_view(request, id: int):
-    s = get_object_or_404(Months, pk=id, status="active")
+    s = get_object_or_404(Months, pk=id, status=True)
     bucket = getattr(settings, "AWS_STORAGE_BUCKET_NAME", "apple-media")
     base = getattr(settings, "AWS_S3_ENDPOINT_URL", "http://localhost:9000").rstrip("/")
     image_key = s.month_image or "placeholder.png"
@@ -176,7 +186,7 @@ def add_to_calculation_view(request, id: int):
     if not order:
         order = Months_calculation.objects.create(created_by=demo, status="draft")
 
-    service = get_object_or_404(Months, pk=id, status="active")
+    service = get_object_or_404(Months, pk=id, status=True)
     Month_indicators.objects.get_or_create(
         order=order,
         service=service,
@@ -194,7 +204,7 @@ def delete_calculation_view(request, id: int):
         return HttpResponseNotAllowed(["POST"])
     with connection.cursor() as cursor:
         cursor.execute(
-            "UPDATE services_order SET status=%s WHERE id=%s AND status <> %s",
+            "UPDATE services_months_calculation SET status=%s WHERE id=%s AND status <> %s",
             ["deleted", id, "deleted"],
         )
     return redirect("months_list")

@@ -1,33 +1,25 @@
-[30/Sep/2025 22:34:25] "GET / HTTP/1.1" 200 6479
-[30/Sep/2025 22:34:30] "GET /months_calculation/15/ HTTP/1.1" 200 1285
-[30/Sep/2025 22:34:37] "POST /month/1/add/ HTTP/1.1" 302 0
-[30/Sep/2025 22:34:37] "GET / HTTP/1.1" 200 6479
-[30/Sep/2025 22:34:38] "GET /months_calculation/15/ HTTP/1.1" 200 2914
-[30/Sep/2025 22:34:40] "POST /months_calculation/15/delete/ HTTP/1.1" 302 0
-[30/Sep/2025 22:34:40] "GET / HTTP/1.1" 200 6479
-[30/Sep/2025 22:34:46] "POST /month/2/add/ HTTP/1.1" 302 0
-[30/Sep/2025 22:34:46] "GET / HTTP/1.1" 200 6479
-[30/Sep/2025 22:34:47] "POST /month/3/add/ HTTP/1.1" 302 0
-[30/Sep/2025 22:34:47] "GET / HTTP/1.1" 200 6479
-[30/Sep/2025 22:34:48] "GET /months_calculation/16/ HTTP/1.1" 200 3802
-[30/Sep/2025 22:34:51] "GET / HTTP/1.1" 200 6479
+[01/Oct/2025 11:13:22] "GET / HTTP/1.1" 200 6479
 Not Found: /.well-known/appspecific/com.chrome.devtools.json
-[30/Sep/2025 22:39:34] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 3730
-[30/Sep/2025 22:39:37] "GET / HTTP/1.1" 200 6479
+[01/Oct/2025 11:13:25] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 3730
+[01/Oct/2025 11:13:27] "GET / HTTP/1.1" 200 6479
 Not Found: /.well-known/appspecific/com.chrome.devtools.json
-[30/Sep/2025 22:39:37] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 3730
-[30/Sep/2025 22:39:43] "POST /month/2/add/ HTTP/1.1" 302 0
-[30/Sep/2025 22:39:43] "GET / HTTP/1.1" 200 6479
+[01/Oct/2025 11:13:27] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 3730
+[01/Oct/2025 11:13:29] "POST /month/5/add/ HTTP/1.1" 200 2
 Not Found: /.well-known/appspecific/com.chrome.devtools.json
-[30/Sep/2025 22:39:43] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 3730
-[30/Sep/2025 22:39:53] "POST /month/4/add/ HTTP/1.1" 302 0
-[30/Sep/2025 22:39:53] "GET / HTTP/1.1" 200 6479
+[01/Oct/2025 11:13:29] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 3730
+[01/Oct/2025 11:13:44] "GET / HTTP/1.1" 200 6479
+[01/Oct/2025 11:18:00] "GET / HTTP/1.1" 200 6479
+[01/Oct/2025 11:18:00] "GET /static/css/styles.css HTTP/1.1" 200 9744
+Not Found: /favicon.ico
+[01/Oct/2025 11:18:00] "GET /favicon.ico HTTP/1.1" 404 3619
 Not Found: /.well-known/appspecific/com.chrome.devtools.json
-[30/Sep/2025 22:39:54] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 3730
-[30/Sep/2025 22:41:10] "GET /months_calculation/16/ HTTP/1.1" 200 4701
+[01/Oct/2025 11:18:02] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 3730
+[01/Oct/2025 11:18:04] "GET / HTTP/1.1" 200 6479
 Not Found: /.well-known/appspecific/com.chrome.devtools.json
-[30/Sep/2025 22:41:10] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 3730
-[30/Sep/2025 22:41:32] "POST /months_calculation/16/delete/ HTTP/1.1" 302 0
-[30/Sep/2025 22:41:32] "GET / HTTP/1.1" 200 6479
+[01/Oct/2025 11:18:04] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 3730
+[01/Oct/2025 11:18:05] "POST /month/6/add/ HTTP/1.1" 200 2
 Not Found: /.well-known/appspecific/com.chrome.devtools.json
-[30/Sep/2025 22:41:32] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 3730
+[01/Oct/2025 11:18:06] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 3730
+[01/Oct/2025 11:18:16] "GET / HTTP/1.1" 200 6479
+[01/Oct/2025 11:18:18] "GET /months_calculation/18/ HTTP/1.1" 200 5585
+[01/Oct/2025 11:18:27] "GET / HTTP/1.1" 200 6479
