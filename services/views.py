@@ -4,6 +4,7 @@ from django.http import Http404, HttpResponseNotAllowed
 from django.db import connection
 from django.contrib.auth.models import User
 from .models import Months, Months_calculation, Month_indicators
+from decimal import Decimal, ROUND_HALF_UP
 
 
 def _get_or_create_demo_user() -> User:
@@ -19,6 +20,59 @@ def _get_current_draft_order_for_demo():
 def _get_current_draft_order_for_request(request):
     user = request.user if getattr(request, "user", None) and request.user.is_authenticated else _get_or_create_demo_user()
     return Months_calculation.objects.filter(created_by=user, status="draft").first()
+
+
+def calculate_application_yield_demo(order_id: int) -> Decimal:
+    """
+    Демонстрационный расчёт итоговой урожайности по заявке без интеграции в прод.
+
+    Алгоритм:
+    - Для каждой позиции заявки берём базовую урожайность месяца (base_yield)
+    - Считаем коэффициенты по температуре и осадкам как отношение фактических к идеальным
+      (ограничивая сверху 1, нижняя граница не обрезается)
+    - Вклад позиции = base_yield * temp_coef * precip_coef
+    - Итог по заявке = сумма вкладов всех позиций
+    - Возвращается Decimal, округлённый до 2 знаков (ROUND_HALF_UP)
+    """
+    order = Months_calculation.objects.get(pk=order_id)
+
+    positions = Month_indicators.objects.select_related("service").filter(order=order)
+    total = Decimal("0")
+    has_positions = False
+
+    for pos in positions:
+        has_positions = True
+        s = pos.service
+
+        base = s.base_yield if s.base_yield is not None else Decimal("0")
+        ideal_temp = s.ideal_temp
+        ideal_precip = Decimal(s.ideal_precip)
+
+        actual_temp = pos.avg_temp if pos.avg_temp is not None else ideal_temp
+        actual_precip = pos.sum_precipitation if pos.sum_precipitation is not None else ideal_precip
+
+        # Защита от случая 0 в идеальном значении
+        if ideal_temp == 0:
+            temp_coef = Decimal("1")
+        else:
+            temp_coef = Decimal(actual_temp) / Decimal(ideal_temp)
+            if temp_coef > 1:
+                temp_coef = Decimal("1")
+
+        if ideal_precip == 0:
+            precip_coef = Decimal("1")
+        else:
+            precip_coef = Decimal(actual_precip) / Decimal(ideal_precip)
+            if precip_coef > 1:
+                precip_coef = Decimal("1")
+
+        contribution = Decimal(base) * temp_coef * precip_coef
+        total += contribution
+
+    if not has_positions:
+        return Decimal("0.00")
+
+    return total.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
 
 def months_list_view(request):
