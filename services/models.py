@@ -54,6 +54,8 @@ class Months_calculation(models.Model):
     # Предметные поля заявки
     location = models.CharField(max_length=50, choices=LOCATIONS, default="moscow")
     person = models.CharField(max_length=50, choices=PERSONS, default="ivanov")
+    # Результат расчёта (сохраняется при завершении заявки)
+    result_value = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     class Meta:
         db_table = "services_months_calculation"

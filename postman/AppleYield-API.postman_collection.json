@@ -1,0 +1,229 @@
+{
+  "info": {
+    "name": "AppleYield API",
+    "_postman_id": "8a6f2a9b-0c5d-4a7a-9a0b-collection-appleyield",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 GET orders list (filters)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/months_calculation?status={{status}}&submitted_from={{submitted_from}}&submitted_to={{submitted_to}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "months_calculation"
+          ],
+          "query": [
+            {"key": "status", "value": "{{status}}"},
+            {"key": "submitted_from", "value": "{{submitted_from}}"},
+            {"key": "submitted_to", "value": "{{submitted_to}}"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "02 GET cart icon",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('capture order_id from cart', function () {",
+              "  var j = pm.response.json();",
+              "  if (j && j.order_id) { pm.collectionVariables.set('order_id', j.order_id.toString()); }",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/months_calculation/cart/"
+      }
+    },
+    {
+      "name": "03 DELETE order (soft)",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/api/months_calculation/{{order_id}}/"
+      }
+    },
+    {
+      "name": "04 GET months list (q filter)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/months/?q={{q}}"
+      }
+    },
+    {
+      "name": "05 POST month create",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('capture service_id', function(){",
+              "  var j = pm.response.json();",
+              "  if (j && j.month_id) { pm.collectionVariables.set('service_id', j.month_id.toString()); }",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"month_name\": \"July Test\",\n  \"description\": \"Desc\",\n  \"main_value\": \"Value\",\n  \"status\": true,\n  \"base_yield\": 50.0,\n  \"ideal_temp\": 20.0,\n  \"ideal_precip\": 80,\n  \"temperature\": 19.0,\n  \"precipitation\": 70\n}"
+        },
+        "url": "{{baseUrl}}/api/months/"
+      }
+    },
+    {
+      "name": "06 POST month image upload",
+      "request": {
+        "method": "POST",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "file", "type": "file", "src": ["/absolute/path/to/image.jpg"] }
+          ]
+        },
+        "url": "{{baseUrl}}/api/months/{{service_id}}/image/"
+      }
+    },
+    {
+      "name": "07 POST add month to draft",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('capture order_id from add', function(){",
+              "  var j = pm.response.json();",
+              "  if (j && j.order_id) { pm.collectionVariables.set('order_id', j.order_id.toString()); }",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/months/{{service_id}}/add/"
+      }
+    },
+    {
+      "name": "08 POST add another month to draft",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/months/{{other_service_id}}/add/"
+      }
+    },
+    {
+      "name": "09 GET cart icon (again)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {"exec": [
+            "var j = pm.response.json(); if (j && j.order_id) pm.collectionVariables.set('order_id', j.order_id.toString());"
+          ]}
+        }
+      ],
+      "request": {"method": "GET", "url": "{{baseUrl}}/api/months_calculation/cart/"}
+    },
+    {
+      "name": "10 GET order detail",
+      "request": {"method": "GET", "url": "{{baseUrl}}/api/months_calculation/{{order_id}}/"}
+    },
+    {
+      "name": "11 PUT month_indicators update (for service_id)",
+      "request": {
+        "method": "PUT",
+        "header": [{"key":"Content-Type","value":"application/json"}],
+        "body": {"mode":"raw","raw":"{\n  \"sum_precipitation\": 90.0,\n  \"avg_temp\": 18.5,\n  \"comment\": \"Adjusted\"\n}"},
+        "url": "{{baseUrl}}/api/months_calculation/{{order_id}}/month_indicators/{{service_id}}/"
+      }
+    },
+    {
+      "name": "12 PUT months_calculation update (location/person)",
+      "request": {
+        "method": "PUT",
+        "header": [{"key":"Content-Type","value":"application/json"}],
+        "body": {"mode":"raw","raw":"{\n  \"location\": \"moscow\",\n  \"person\": \"ivanov\"\n}"},
+        "url": "{{baseUrl}}/api/months_calculation/{{order_id}}/"
+      }
+    },
+    {
+      "name": "13 PUT finish draft (expect 409)",
+      "request": {"method":"PUT", "url":"{{baseUrl}}/api/months_calculation/{{order_id}}/finish/"}
+    },
+    {
+      "name": "14 PUT submit order",
+      "request": {"method":"PUT", "url":"{{baseUrl}}/api/months_calculation/{{order_id}}/submit/"}
+    },
+    {
+      "name": "15 PUT finish order (calc result_value)",
+      "request": {"method":"PUT", "url":"{{baseUrl}}/api/months_calculation/{{order_id}}/finish/"}
+    },
+    {
+      "name": "16 POST register user",
+      "request": {
+        "method": "POST",
+        "header": [{"key":"Content-Type","value":"application/json"}],
+        "body": {"mode":"raw","raw":"{\n  \"username\": \"user1\",\n  \"password\": \"pass12345\",\n  \"email\": \"user1@example.com\"\n}"},
+        "url": "{{baseUrl}}/api/auth/register/"
+      }
+    },
+    {
+      "name": "17 POST login",
+      "request": {
+        "method": "POST",
+        "header": [{"key":"Content-Type","value":"application/json"}],
+        "body": {"mode":"raw","raw":"{\n  \"username\": \"user1\",\n  \"password\": \"pass12345\"\n}"},
+        "url": "{{baseUrl}}/api/auth/login/"
+      }
+    },
+    {
+      "name": "18 GET users/me",
+      "request": {"method":"GET", "url":"{{baseUrl}}/api/users/me/"}
+    },
+    {
+      "name": "19 PUT users/me",
+      "request": {
+        "method": "PUT",
+        "header": [{"key":"Content-Type","value":"application/json"}],
+        "body": {"mode":"raw","raw":"{\n  \"email\": \"user1+upd@example.com\",\n  \"first_name\": \"First\",\n  \"last_name\": \"Last\"\n}"},
+        "url": "{{baseUrl}}/api/users/me/"
+      }
+    },
+    {
+      "name": "20 POST logout",
+      "request": {"method":"POST", "url":"{{baseUrl}}/api/auth/logout/"}
+    },
+    {
+      "name": "21 GET order detail (select changed data)",
+      "request": {"method":"GET", "url":"{{baseUrl}}/api/months_calculation/{{order_id}}/"}
+    }
+  ],
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8000"},
+    {"key": "q", "value": "Ju"},
+    {"key": "status", "value": "submitted"},
+    {"key": "submitted_from", "value": ""},
+    {"key": "submitted_to", "value": ""},
+    {"key": "order_id", "value": ""},
+    {"key": "service_id", "value": ""},
+    {"key": "other_service_id", "value": "2"}
+  ]
+}
+
+
