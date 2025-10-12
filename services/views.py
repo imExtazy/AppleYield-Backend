@@ -141,8 +141,8 @@ def month_detail_view(request, id: int):
 def months_calculation_view(request, id: int):
     order = get_object_or_404(Months_calculation, pk=id)
     if order.status == "deleted":
-        #raise Http404("Application not found")
-        #поменял с 404 на редирект на главную
+        #raise Http404("Application not found") 
+        #поменял с 404 на редирект на главную страницу
         return redirect("months_list")
 
     bucket = getattr(settings, "AWS_STORAGE_BUCKET_NAME", "apple-media")
