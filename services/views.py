@@ -2,13 +2,14 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
 from django.http import Http404, HttpResponseNotAllowed, HttpResponse
 from django.db import connection
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from .models import Months, Months_calculation, Month_indicators
 from decimal import Decimal, ROUND_HALF_UP
 
 
-def _get_or_create_demo_user() -> User:
-    user, _ = User.objects.get_or_create(username="demo", defaults={"email": "demo@example.com"})
+def _get_or_create_demo_user():
+    UserModel = get_user_model()
+    user, _ = UserModel.objects.get_or_create(email="demo@example.com")
     return user
 
 

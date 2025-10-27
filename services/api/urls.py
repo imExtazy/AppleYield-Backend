@@ -9,15 +9,16 @@ from .views import (
     MonthsCalculationRejectView,
     MonthIndicatorsUpdateView,
     MonthIndicatorsDeleteView,
-    RegisterView,
-    LoginView,
-    LogoutView,
+    login_view,
+    logout_view,
     MeView,
+    UserViewSet,
 )
 
 router = DefaultRouter()
 router.register(r"months", MonthsViewSet, basename="months")
 router.register(r"months_calculation", MonthsCalculationViewSet, basename="months_calculation")
+router.register(r"user", UserViewSet, basename="user")
 
 urlpatterns = [
     # сначала специфичные пути, чтобы не перехватывались роутером как pk
@@ -28,9 +29,8 @@ urlpatterns = [
     path("months_calculation/<int:order_id>/month_indicators/<int:service_id>/", MonthIndicatorsUpdateView.as_view(), name="month_indicators_update"),
     path("months_calculation/<int:order_id>/month_indicators/<int:service_id>/delete/", MonthIndicatorsDeleteView.as_view(), name="month_indicators_delete"),
     # пользователи
-    path("auth/register/", RegisterView.as_view(), name="auth_register"),
-    path("auth/login/", LoginView.as_view(), name="auth_login"),
-    path("auth/logout/", LogoutView.as_view(), name="auth_logout"),
+    path("login", login_view, name="auth_login"),
+    path("logout", logout_view, name="auth_logout"),
     path("users/me/", MeView.as_view(), name="users_me"),
     # в конце — роутер
     path("", include(router.urls)),

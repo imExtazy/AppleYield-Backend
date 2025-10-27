@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:16
     container_name: appleyield-postgres
     environment:
       POSTGRES_DB: appleyield
@@ -83,6 +83,13 @@ services:
       - minio2
       - minio3
       - minio4
+
+  redis:
+    image: redis:7
+    container_name: appleyield-redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
 
 volumes:
   pgdata:

@@ -1,6 +1,6 @@
 from django.conf import settings
 from rest_framework import serializers
-from services.models import Months, Months_calculation, Month_indicators
+from services.models import Months, Months_calculation, Month_indicators, CustomUser
 
 
 class MonthsListSerializer(serializers.ModelSerializer):
@@ -55,8 +55,8 @@ class MonthIndicatorsSerializer(serializers.ModelSerializer):
 
 
 class MonthsCalculationListSerializer(serializers.ModelSerializer):
-    created_by_username = serializers.CharField(source="created_by.username", read_only=True)
-    moderator_username = serializers.CharField(source="moderator.username", read_only=True)
+    created_by_email = serializers.EmailField(source="created_by.email", read_only=True)
+    moderator_email = serializers.EmailField(source="moderator.email", read_only=True)
 
     class Meta:
         model = Months_calculation
@@ -66,8 +66,8 @@ class MonthsCalculationListSerializer(serializers.ModelSerializer):
             "created_at",
             "submitted_at",
             "finished_at",
-            "created_by_username",
-            "moderator_username",
+            "created_by_email",
+            "moderator_email",
             "location",
             "person",
             "result_value",
@@ -111,20 +111,27 @@ class MonthsCartSerializer(serializers.Serializer):
 
 
 class RegisterSerializer(serializers.Serializer):
-    username = serializers.CharField()
+    email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
-    email = serializers.EmailField(required=False, allow_blank=True)
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
+    email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
 
 class MeSerializer(serializers.Serializer):
-    username = serializers.CharField(read_only=True)
     email = serializers.EmailField(required=False, allow_blank=True)
     first_name = serializers.CharField(required=False, allow_blank=True)
     last_name = serializers.CharField(required=False, allow_blank=True)
+class UserSerializer(serializers.ModelSerializer):
+    is_staff = serializers.BooleanField(default=False, required=False)
+    is_superuser = serializers.BooleanField(default=False, required=False)
+
+    class Meta:
+        model = CustomUser
+        fields = ["email", "password", "is_staff", "is_superuser"]
+        extra_kwargs = {"password": {"write_only": True}}
+
 
 

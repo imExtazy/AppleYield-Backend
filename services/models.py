@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 
 class Months(models.Model):
     month_id = models.AutoField(primary_key=True)
@@ -46,10 +47,10 @@ class Months_calculation(models.Model):
 
     status = models.CharField(max_length=20, choices=STATUSES, default="draft")
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     submitted_at = models.DateTimeField(null=True, blank=True)
     finished_at = models.DateTimeField(null=True, blank=True)
-    moderator = models.ForeignKey(User, related_name="moderated_orders", on_delete=models.PROTECT, null=True, blank=True)
+    moderator = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="moderated_orders", on_delete=models.PROTECT, null=True, blank=True)
 
     # Предметные поля заявки
     location = models.CharField(max_length=50, choices=LOCATIONS, default="moscow")
@@ -78,4 +79,37 @@ class Month_indicators(models.Model):
     def __str__(self):
         return f"OrderService(order={self.order_id}, service={self.service_id})"
 
-# Create your models here.
+class NewUserManager(UserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('User must have an email address')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        if password:
+            user.set_password(password)
+        else:
+            user.set_unusable_password()
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+        return self.create_user(email, password, **extra_fields)
+
+
+class CustomUser(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField("email адрес", unique=True)
+    is_staff = models.BooleanField(default=False, verbose_name="Является ли пользователь менеджером?")
+    is_superuser = models.BooleanField(default=False, verbose_name="Является ли пользователь админом?")
+
+    USERNAME_FIELD = 'email'
+
+    objects = NewUserManager()
+
+    def __str__(self) -> str:
+        return self.email
