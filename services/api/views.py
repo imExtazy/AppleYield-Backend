@@ -112,7 +112,16 @@ class MonthsCalculationViewSet(viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request):
-        qs = Months_calculation.objects.exclude(status__in=["deleted", "draft"]).select_related("created_by", "moderator")
+        if request.user.is_staff or request.user.is_superuser:
+            # Администратор/модератор видит все заявки, включая draft/deleted
+            qs = Months_calculation.objects.select_related("created_by", "moderator")
+        else:
+            # Обычный пользователь видит только свои, без черновиков
+            qs = (
+                Months_calculation.objects
+                .exclude(status__in=["deleted", "draft"]).select_related("created_by", "moderator")
+                .filter(created_by=request.user)
+            )
         if not (request.user.is_staff or request.user.is_superuser):
             qs = qs.filter(created_by=request.user)
         status_filter = request.query_params.get("status")
