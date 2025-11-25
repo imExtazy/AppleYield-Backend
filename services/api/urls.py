@@ -12,6 +12,8 @@ from .views import (
     login_view,
     logout_view,
     MeView,
+    ChangePasswordView,
+    csrf_view,
     UserViewSet,
 )
 
@@ -32,6 +34,8 @@ urlpatterns = [
     path("login", login_view, name="auth_login"),
     path("logout", logout_view, name="auth_logout"),
     path("users/me/", MeView.as_view(), name="users_me"),
+    path("users/change_password/", ChangePasswordView.as_view(), name="users_change_password"),
+    path("csrf/", csrf_view, name="csrf"),
     # в конце — роутер
     path("", include(router.urls)),
 ]

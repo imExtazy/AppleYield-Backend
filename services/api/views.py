@@ -21,11 +21,13 @@ from .serializers import (
     RegisterSerializer,
     LoginSerializer,
     MeSerializer,
+    ChangePasswordSerializer,
     UserSerializer,
 )
 from .storage import generate_image_key, delete_object_if_exists
 from .permissions import IsManager, IsAdmin
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie, csrf_exempt
+from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from drf_yasg.utils import swagger_auto_schema
 
@@ -254,11 +256,11 @@ from django.contrib.auth import authenticate, login, logout
 from services.models import CustomUser
 
 
+@swagger_auto_schema(method='post', request_body=LoginSerializer)
+@csrf_exempt  # TEMP: отключаем CSRF для диагностики
+@api_view(["POST"])
 @permission_classes([AllowAny])
 @authentication_classes([])
-@csrf_exempt
-@swagger_auto_schema(method='post', request_body=LoginSerializer)
-@api_view(["POST"])
 def login_view(request):
     serializer = LoginSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -272,6 +274,8 @@ def login_view(request):
 
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
+@csrf_protect
 def logout_view(request):
     logout(request._request)
     return Response({"status": "Success"})
@@ -302,6 +306,28 @@ class MeView(APIView):
             "first_name": getattr(request.user, "first_name", "") or "",
             "last_name": getattr(request.user, "last_name", "") or "",
         })
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+@ensure_csrf_cookie
+def csrf_view(request):
+    return JsonResponse({"status": "ok"})
+
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(request_body=ChangePasswordSerializer)
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        old_password = serializer.validated_data["old_password"]
+        new_password = serializer.validated_data["new_password"]
+        if not request.user.check_password(old_password):
+            return Response({"detail": "Invalid old password"}, status=400)
+        request.user.set_password(new_password)
+        request.user.save()
+        return Response({"status": "ok"}, status=200)
 from rest_framework import viewsets
 from .permissions import IsManager, IsAdmin
 

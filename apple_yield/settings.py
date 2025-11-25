@@ -26,7 +26,28 @@ SECRET_KEY = "django-insecure-r*9e2(x9v!u9b5q5x-1rid)@kb0!c54b#vw-hbrixk4b8@y8j%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "10.231.163.44"
+]
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:3000",
+    # при необходимости: "http://localhost:3000",
+]
+CORS_ALLOW_CREDENTIALS = True
+from corsheaders.defaults import default_headers
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:3000"]
+
+CSRF_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
 
 
 # Application definition
@@ -42,9 +63,11 @@ INSTALLED_APPS = [
     "storages",
     "rest_framework",
     "drf_yasg",
+    "corsheaders"
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -165,7 +188,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 """ DRF settings """
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.BasicAuthentication",
+        #"rest_framework.authentication.BasicAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
