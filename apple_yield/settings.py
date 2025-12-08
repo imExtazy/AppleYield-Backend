@@ -216,3 +216,12 @@ SESSION_CACHE_ALIAS = "default"
 
 # Custom user model
 AUTH_USER_MODEL = "services.CustomUser"
+
+""" Async compute service integration """
+# Базовый URL асинхронного сервиса (Go)
+ASYNC_SERVICE_BASE_URL = os.getenv("ASYNC_SERVICE_BASE_URL", "http://localhost:8081")
+# Абсолютный URL колбэка основного сервиса
+ASYNC_CALLBACK_URL = os.getenv("ASYNC_CALLBACK_URL", "http://localhost:8000/api/async/result/")
+# Общий токен (8 символов) для псевдо-авторизации обмена между сервисами
+# В проде брать из переменных окружения, здесь задаём дефолт.
+ASYNC_SHARED_TOKEN = os.getenv("ASYNC_SHARED_TOKEN", "A1B2C3D4")

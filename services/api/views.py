@@ -9,7 +9,6 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.decorators import action
 from services.models import Months, Months_calculation, Month_indicators
-from services.views import calculate_application_yield_demo
 from .serializers import (
     MonthsListSerializer,
     MonthsCreateUpdateSerializer,
@@ -30,6 +29,8 @@ from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie, csrf_
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from drf_yasg.utils import swagger_auto_schema
+import requests
+from decimal import Decimal
 
 
 class MonthsViewSet(viewsets.ModelViewSet):
@@ -194,13 +195,23 @@ class MonthsCalculationFinishView(APIView):
         if order.status != "submitted":
             return Response({"detail": "Only submitted can be finished"}, status=409)
         moderator = request.user
-        result = calculate_application_yield_demo(order.id)
-        order.status = "finished"
-        order.moderator = moderator
-        order.finished_at = timezone.now()
-        order.result_value = result
-        order.save(update_fields=["status", "moderator", "finished_at", "result_value"])
-        return Response(MonthsCalculationDetailSerializer(order).data)
+        # Фиксируем модератора, но статус и результат будут установлены после колбэка
+        if order.moderator_id != moderator.id:
+            order.moderator = moderator
+            order.save(update_fields=["moderator"])
+        payload = {
+            "order_id": order.id,
+            "callback_url": getattr(settings, "ASYNC_CALLBACK_URL", "http://localhost:8000/api/async/result/"),
+        }
+        compute_url = (getattr(settings, "ASYNC_SERVICE_BASE_URL", "http://localhost:8081").rstrip("/") + "/compute")
+        try:
+            resp = requests.post(compute_url, json=payload, timeout=10)
+            # Если удалённый сервис отвечает не 2xx — считаем как ошибка и сообщаем клиенту
+            if resp.status_code >= 400:
+                return Response({"detail": f"Async service error: {resp.status_code}"}, status=502)
+        except requests.RequestException:
+            return Response({"detail": "Async service unavailable"}, status=502)
+        return Response(MonthsCalculationDetailSerializer(order).data, status=202)
 
 
 class MonthsCalculationRejectView(APIView):
@@ -250,6 +261,66 @@ class MonthIndicatorsDeleteView(APIView):
         service = get_object_or_404(Months, pk=service_id)
         Month_indicators.objects.filter(order=order, service=service).delete()
         return Response(status=204)
+
+
+class AsyncOrderPayloadView(APIView):
+    permission_classes = [AllowAny]
+    @swagger_auto_schema(operation_description="Provide payload for async compute by token")
+    def post(self, request):
+        token = (request.data.get("token") or "").strip()
+        if token != getattr(settings, "ASYNC_SHARED_TOKEN", ""):
+            return Response(status=403)
+        try:
+            order_id = int(request.data.get("order_id"))
+        except (TypeError, ValueError):
+            return Response({"detail": "order_id must be int"}, status=400)
+        order = get_object_or_404(Months_calculation, pk=order_id)
+        if order.status != "submitted":
+            return Response({"detail": "Only submitted orders are allowed"}, status=409)
+        items_payload = []
+        qs = Month_indicators.objects.select_related("service").filter(order=order)
+        for item in qs:
+            s = item.service
+            # сериализуем Decimal как строки, int как int; null поддерживаем как None
+            items_payload.append({
+                "base_yield": str(s.base_yield) if s.base_yield is not None else None,
+                "ideal_temp": str(s.ideal_temp) if s.ideal_temp is not None else None,
+                "ideal_precip": int(s.ideal_precip) if s.ideal_precip is not None else None,
+                "avg_temp": str(item.avg_temp) if item.avg_temp is not None else None,
+                "sum_precipitation": str(item.sum_precipitation) if item.sum_precipitation is not None else None,
+            })
+        return Response({
+            "order_id": order.id,
+            "items": items_payload,
+        })
+
+
+class AsyncResultCallbackView(APIView):
+    permission_classes = [AllowAny]
+    @swagger_auto_schema(operation_description="Receive async compute result by token")
+    def post(self, request):
+        token = (request.data.get("token") or "").strip()
+        if token != getattr(settings, "ASYNC_SHARED_TOKEN", ""):
+            return Response(status=403)
+        try:
+            order_id = int(request.data.get("order_id"))
+        except (TypeError, ValueError):
+            return Response({"detail": "order_id must be int"}, status=400)
+        result_value_raw = request.data.get("result_value")
+        if result_value_raw is None:
+            return Response({"detail": "result_value is required"}, status=400)
+        try:
+            result_value = Decimal(str(result_value_raw))
+        except Exception:
+            return Response({"detail": "result_value must be number/decimal"}, status=400)
+        order = get_object_or_404(Months_calculation, pk=order_id)
+        if order.status != "submitted":
+            return Response({"detail": "Invalid order status for result"}, status=409)
+        order.result_value = result_value
+        order.finished_at = timezone.now()
+        order.status = "finished"
+        order.save(update_fields=["result_value", "finished_at", "status"])
+        return Response(MonthsCalculationDetailSerializer(order).data)
 
 
 from django.contrib.auth import authenticate, login, logout

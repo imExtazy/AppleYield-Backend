@@ -9,6 +9,8 @@ from .views import (
     MonthsCalculationRejectView,
     MonthIndicatorsUpdateView,
     MonthIndicatorsDeleteView,
+    AsyncOrderPayloadView,
+    AsyncResultCallbackView,
     login_view,
     logout_view,
     MeView,
@@ -30,6 +32,9 @@ urlpatterns = [
     path("months_calculation/<int:id>/reject/", MonthsCalculationRejectView.as_view(), name="months_calculation_reject"),
     path("months_calculation/<int:order_id>/month_indicators/<int:service_id>/", MonthIndicatorsUpdateView.as_view(), name="month_indicators_update"),
     path("months_calculation/<int:order_id>/month_indicators/<int:service_id>/delete/", MonthIndicatorsDeleteView.as_view(), name="month_indicators_delete"),
+    # async integration endpoints
+    path("async/order_payload/", AsyncOrderPayloadView.as_view(), name="async_order_payload"),
+    path("async/result/", AsyncResultCallbackView.as_view(), name="async_result"),
     # пользователи
     path("login", login_view, name="auth_login"),
     path("logout", logout_view, name="auth_logout"),
