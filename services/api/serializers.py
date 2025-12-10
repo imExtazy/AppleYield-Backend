@@ -11,6 +11,7 @@ class MonthsListSerializer(serializers.ModelSerializer):
         fields = [
             "month_id",
             "month_name",
+            "description",
             "main_value",
             "image_url",
         ]

@@ -360,6 +360,8 @@ class MeView(APIView):
             "email": request.user.email or "",
             "first_name": getattr(request.user, "first_name", "") or "",
             "last_name": getattr(request.user, "last_name", "") or "",
+            "is_staff": bool(getattr(request.user, "is_staff", False)),
+            "is_superuser": bool(getattr(request.user, "is_superuser", False)),
         }
         return Response(data)
 
@@ -376,6 +378,8 @@ class MeView(APIView):
             "email": request.user.email or "",
             "first_name": getattr(request.user, "first_name", "") or "",
             "last_name": getattr(request.user, "last_name", "") or "",
+            "is_staff": bool(getattr(request.user, "is_staff", False)),
+            "is_superuser": bool(getattr(request.user, "is_superuser", False)),
         })
 
 
